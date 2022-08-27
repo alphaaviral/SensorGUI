@@ -29,10 +29,15 @@ namespace sensorGUI
         SerialPort serialPort;
         string[] serialPorts;
         bool isConnectedToCOM = false;
+        List<TextBox> textBoxList;
         public MainWindow()
         {
             InitializeComponent();
             InitializeSerialPorts();
+            textBoxList = new List<TextBox>();
+            textBoxList.Add(data1TextBox);
+            textBoxList.Add(data2TextBox);
+            textBoxList.Add(data3TextBox);
         }
 
         private void GetVarNames()
@@ -76,6 +81,7 @@ namespace sensorGUI
                 startBtn.Content = "Stop";
                 isConnectedToCOM = true;
                 portNamesCmbBox.IsEnabled = false;
+                refreshBtn.IsEnabled = false;
             }
             catch (UnauthorizedAccessException)
             {
@@ -93,10 +99,12 @@ namespace sensorGUI
 
         private void DisconnectFromCOMPort()
         {
+            serialPort.DataReceived -= DataReceivedHandler;
             serialPort.Close();
             startBtn.Content = "Start";
             isConnectedToCOM = false;
             portNamesCmbBox.IsEnabled = true;
+            refreshBtn.IsEnabled = true;
         }
 
         private void refreshBtn_Click(object sender, RoutedEventArgs e)
@@ -114,21 +122,27 @@ namespace sensorGUI
         {
             if (!serialPort.IsOpen) return;
             SerialPort sp = (SerialPort)sender;
-            //string indata = sp.ReadExisting();
             string data="";
             char c = '.';
             byte[] buffer = new byte[1];
-            while (true)
+            try
             {
-                sp.Read(buffer, 0, 1);
-                c = Convert.ToChar(buffer[0]);
-                if (c=='\n'){
-                    break;
-                }
-                data += c;
-                
-            }
+                while (true)
+                {
+                    sp.Read(buffer, 0, 1);
+                    c = Convert.ToChar(buffer[0]);
+                    if (c == '\n')
+                    {
+                        break;
+                    }
+                    data += c;
 
+                }
+            }
+            catch(Exception ex)
+            {
+                return;
+            }
             //using (FileStream fs = File.Open("D:\\OneDrive - IIT Delhi\\Documents\\TK Gandhi Project\\file2.txt", FileMode.Append, FileAccess.Write, FileShare.None))
             //{
             //    Byte[] info = new UTF8Encoding(true).GetBytes(data+'\n');
@@ -140,15 +154,19 @@ namespace sensorGUI
             Debug.Print(data);
             Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        data1TextBox.Text = dataArray[0];
-                        data2TextBox.Text = dataArray[1];
-                        data3TextBox.Text = dataArray[2];
+                        int a = dataArray.Length;
+                        if (a > 2)
+                        {
+                            textBoxList[0].Text = dataArray[0];
+                            textBoxList[1].Text = dataArray[1];
+                            textBoxList[2].Text = dataArray[2];
+                        }
                     }));
         }
 
         private void portNamesCmbBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            portNamesCmbBox.Items.Remove("Select a COM Port");
+            //portNamesCmbBox.Items.Remove("Select a COM Port");
         }
 
         //private void readData()
