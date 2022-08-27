@@ -1,0 +1,70 @@
+﻿<Window x:Class="sensorGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:local="clr-namespace:sensorGUI"
+        mc:Ignorable="d"
+        Title="Sensor GUI" Height="450" Width="800">
+    <Grid>
+        <ComboBox Name="portNamesCmbBox" HorizontalAlignment="Left" Margin="345,40,0,0" VerticalAlignment="Top" Width="160" SelectionChanged="portNamesCmbBox_SelectionChanged"/>
+        <Button Name="startBtn" Content="Start" HorizontalAlignment="Left" Margin="532,41,0,0" VerticalAlignment="Top" Click="startBtn_Click" RenderTransformOrigin="3.222,0.779"/>
+        <Button Name="refreshBtn" Content="Refresh Serial Ports" HorizontalAlignment="Left" VerticalAlignment="Top" Click="refreshBtn_Click" Margin="372,82,0,0" RenderTransformOrigin="-0.005,0.478"/>
+        <TextBox IsReadOnly="True" Name="data1TextBox" HorizontalAlignment="Left" Margin="89,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" Name="data2TextBox" HorizontalAlignment="Center" Margin="0,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" Name="data3TextBox" HorizontalAlignment="Left" Margin="605,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox  Width="146"  VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="varNumTxtBox" Margin="174,44,0,0"/>
+        <TextBlock IsHitTestVisible="False" Text="Enter Number of Variables" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="178,45,0,0" Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=varNumTxtBox}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBox Name ="var2NameTxtBox" HorizontalAlignment="Center" Margin="0,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBlock IsHitTestVisible="False" Text="Enter Variable 2 Name" VerticalAlignment="Top" HorizontalAlignment="center" Margin="0,192,0,0" Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=var2NameTxtBox}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBox Name="var3NameTxtBox" HorizontalAlignment="Left" Margin="605,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBlock IsHitTestVisible="False" Text="Enter Variable 3 Name" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="605,192,0,0" Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=var3NameTxtBox}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBox Name ="var1NameTxtBox" HorizontalAlignment="Left" Margin="89,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBlock IsHitTestVisible="False" Text="Enter Variable 1 Name" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="89,192,0,0" Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=var1NameTxtBox}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </Grid>
+</Window>
