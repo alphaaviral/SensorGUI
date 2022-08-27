@@ -12,12 +12,16 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WinForms = System.Windows.Forms;
+using System.Windows.Forms.Integration;
 using LiveCharts;
 using LiveCharts.Wpf;
+using Ookii.Dialogs.Wpf;
 
 namespace sensorGUI
 {
@@ -30,19 +34,20 @@ namespace sensorGUI
         string[] serialPorts;
         bool isConnectedToCOM = false;
         List<TextBox> textBoxList;
+        string currentFileName = "";
+        string currentFilePath="";
+        string currentFolderPath="";
+        FileStream currentFile;
+        bool isReset = true;
         public MainWindow()
         {
             InitializeComponent();
             InitializeSerialPorts();
+            InitializeGUI();
             textBoxList = new List<TextBox>();
             textBoxList.Add(data1TextBox);
             textBoxList.Add(data2TextBox);
             textBoxList.Add(data3TextBox);
-        }
-
-        private void GetVarNames()
-        {
-
         }
 
         private void InitializeSerialPorts()
@@ -68,6 +73,84 @@ namespace sensorGUI
             }
             if (isConnectedToCOM) portNamesCmbBox.IsEnabled = false;
 
+        }
+
+        private void InitializeGUI()
+        {
+            resetbtn.IsEnabled = false;
+            folderPathTxtBox.Text = "No Folder Choosen";
+        }
+
+        private bool createNewFile()
+        {
+            string timeStamp = DateTime.Now.ToString("HH-mm-sstt,dd-MM-yyyy");
+            currentFileName = timeStamp + ".csv";
+            currentFilePath = folderPathTxtBox.Text + '\\' + currentFileName;
+            if (currentFolderPath == "")
+            {
+                MessageBox.Show("Choose a Folder to store data files in", "Choose a Folder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    FileStream fs = File.Create(currentFilePath);
+                    fs.Close();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString(), "Error While Creating File", MessageBoxButton.OK, MessageBoxImage.Stop);
+                    return false;
+                }
+            }
+        }
+
+        private bool OpenFile()
+        {
+            if (isReset)
+            {
+                if(!createNewFile()) return false;
+            }
+            try
+            {
+                currentFile = File.Open(currentFilePath, FileMode.Append);
+                isReset = false;
+                resetbtn.IsEnabled = false;
+                folderPathTxtBox.IsEnabled = false;
+                browseBtn.IsEnabled = false;
+                return true;
+            }
+            catch(DirectoryNotFoundException)
+            {
+                MessageBox.Show("The File Path Could Not be Found!", "Not Found", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Unable to open the specified file due to authorization issues", "UnAuthorized", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString());
+                return false;
+            }
+            
+        }
+
+        private void CloseFile()
+        {
+            currentFile.Close();
+            resetbtn.IsEnabled = true;
+        }
+
+        private void logDataInCSV(string data)
+        {
+            data = data.Replace(' ', ',');
+            Byte[] info = new UTF8Encoding(true).GetBytes(data + '\n');
+            currentFile.Write(info, 0, info.Length);
         }
 
         private void ConnectToCOMPort()
@@ -107,22 +190,11 @@ namespace sensorGUI
             refreshBtn.IsEnabled = true;
         }
 
-        private void refreshBtn_Click(object sender, RoutedEventArgs e)
-        {
-            InitializeSerialPorts();
-        }
-
-        private void startBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isConnectedToCOM) ConnectToCOMPort();
-            else DisconnectFromCOMPort();
-        }
-
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             if (!serialPort.IsOpen) return;
             SerialPort sp = (SerialPort)sender;
-            string data="";
+            string data = "";
             char c = '.';
             byte[] buffer = new byte[1];
             try
@@ -139,62 +211,63 @@ namespace sensorGUI
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return;
             }
-            //using (FileStream fs = File.Open("D:\\OneDrive - IIT Delhi\\Documents\\TK Gandhi Project\\file2.txt", FileMode.Append, FileAccess.Write, FileShare.None))
-            //{
-            //    Byte[] info = new UTF8Encoding(true).GetBytes(data+'\n');
-            //    // Add some information to the file.
-            //    fs.Write(info, 0, info.Length);
-            //}
             String[] dataArray = data.Split(' ');
-            Debug.Print("Data Received:");
-            Debug.Print(data);
+            logDataInCSV(data);
             Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        int a = dataArray.Length;
-                        if (a > 2)
-                        {
-                            textBoxList[0].Text = dataArray[0];
-                            textBoxList[1].Text = dataArray[1];
-                            textBoxList[2].Text = dataArray[2];
-                        }
-                    }));
+            {
+                int a = dataArray.Length;
+                if (a > 2)
+                {
+                    textBoxList[0].Text = dataArray[0];
+                    textBoxList[1].Text = dataArray[1];
+                    textBoxList[2].Text = dataArray[2];
+                }
+            }));
         }
 
-        private void portNamesCmbBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void refreshBtn_Click(object sender, RoutedEventArgs e)
         {
-            //portNamesCmbBox.Items.Remove("Select a COM Port");
+            InitializeSerialPorts();
         }
 
-        //private void readData()
-        //{
-        //    try
-        //    {
-        //        while (isConnectedToCOM)
-        //        {
+        private void startBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isConnectedToCOM)
+            {
+                bool success = false;
+                success = OpenFile();
+                if (success) ConnectToCOMPort();
+            }
+            else
+            {
+                DisconnectFromCOMPort();
+                CloseFile();
+            }
+        }
 
-        //            Dispatcher.BeginInvoke(new Action(() =>
-        //            {
+        private void resetbtn_Click(object sender, RoutedEventArgs e)
+        {
+            isReset = true;
+            browseBtn.IsEnabled = true;
+            folderPathTxtBox.IsEnabled = true;
+        }
 
-        //                dataTextBox.Text = dataTextBox.Text + Environment.NewLine + serialPort.ReadExisting();
-        //                dataTextBox.ScrollToEnd();
-        //            }));
-
-        //            newThread.Join(10);
-
-        //        }
-        //    }
-        //    catch (ThreadAbortException)
-        //    {
-
-        //    }
-        //    catch(Exception e)
-        //    {
-
-        //    }
-        //}
+        private void browseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+            dialog.Description = "Choose the folder to store data file";
+            dialog.UseDescriptionForTitle = true;
+            dialog.ShowNewFolderButton = true;
+            bool? success = dialog.ShowDialog();
+            if(success == true)
+            {
+                currentFolderPath = dialog.SelectedPath;
+                folderPathTxtBox.Text = currentFolderPath;
+            }
+        }
     }
 }

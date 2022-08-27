@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:sensorGUI"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         Title="Sensor GUI" Height="450" Width="800">
     <Grid>
-        <ComboBox Name="portNamesCmbBox" HorizontalAlignment="Left" Margin="345,40,0,0" VerticalAlignment="Top" Width="160" SelectionChanged="portNamesCmbBox_SelectionChanged"/>
+        <ComboBox Name="portNamesCmbBox" HorizontalAlignment="Left" Margin="345,40,0,0" VerticalAlignment="Top" Width="160"/>
         <Button Name="startBtn" Content="Start" HorizontalAlignment="Left" Margin="532,41,0,0" VerticalAlignment="Top" Click="startBtn_Click" RenderTransformOrigin="3.222,0.779"/>
         <Button Name="refreshBtn" Content="Refresh Serial Ports" HorizontalAlignment="Left" VerticalAlignment="Top" Click="refreshBtn_Click" Margin="372,82,0,0" RenderTransformOrigin="-0.005,0.478"/>
         <TextBox IsReadOnly="True" Name="data1TextBox" HorizontalAlignment="Left" Margin="89,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
@@ -66,5 +67,8 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
+        <Button x:Name="resetbtn" Content="Reset" HorizontalAlignment="Left" Margin="532,77,0,0" VerticalAlignment="Top" Click="resetbtn_Click"/>
+        <TextBox x:Name="folderPathTxtBox" IsReadOnly="true" HorizontalAlignment="Left" Margin="174,78,0,0" VerticalAlignment="Top" Width="120" />
+        <Button x:Name="browseBtn" Content="Browse" HorizontalAlignment="Left" Margin="128,74,0,0" VerticalAlignment="Top" Click="browseBtn_Click"/>
     </Grid>
 </Window>
