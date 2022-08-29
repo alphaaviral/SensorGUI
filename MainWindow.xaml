@@ -7,14 +7,18 @@
         xmlns:local="clr-namespace:sensorGUI"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="Sensor GUI" Height="450" Width="800">
+        d:DataContext="{d:DesignInstance local:MainWindow}"
+        Title="Sensor GUI" Height="450" Width="800"
+        WindowState="Maximized"
+        >
+
     <Grid>
         <ComboBox Name="portNamesCmbBox" HorizontalAlignment="Left" Margin="345,40,0,0" VerticalAlignment="Top" Width="160"/>
         <Button Name="startBtn" Content="Start" HorizontalAlignment="Left" Margin="532,41,0,0" VerticalAlignment="Top" Click="startBtn_Click" RenderTransformOrigin="3.222,0.779"/>
         <Button Name="refreshBtn" Content="Refresh Serial Ports" HorizontalAlignment="Left" VerticalAlignment="Top" Click="refreshBtn_Click" Margin="372,82,0,0" RenderTransformOrigin="-0.005,0.478"/>
         <TextBox IsReadOnly="True" Name="data1TextBox" HorizontalAlignment="Left" Margin="89,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
         <TextBox IsReadOnly="True" Name="data2TextBox" HorizontalAlignment="Center" Margin="0,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-        <TextBox IsReadOnly="True" Name="data3TextBox" HorizontalAlignment="Left" Margin="605,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" Name="data3TextBox" HorizontalAlignment="Right" Margin="0,156,75,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
         <TextBox  Width="146"  VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="varNumTxtBox" Margin="174,44,0,0"/>
         <TextBlock IsHitTestVisible="False" Text="Enter Number of Variables" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="178,45,0,0" Foreground="DarkGray">
             <TextBlock.Style>
@@ -28,47 +32,30 @@
                 </Style>
             </TextBlock.Style>
         </TextBlock>
-        <TextBox Name ="var2NameTxtBox" HorizontalAlignment="Center" Margin="0,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBlock IsHitTestVisible="False" Text="Enter Variable 2 Name" VerticalAlignment="Top" HorizontalAlignment="center" Margin="0,192,0,0" Foreground="DarkGray">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Text, ElementName=var2NameTxtBox}" Value="">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <TextBox Name="var3NameTxtBox" HorizontalAlignment="Left" Margin="605,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBlock IsHitTestVisible="False" Text="Enter Variable 3 Name" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="605,192,0,0" Foreground="DarkGray">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Text, ElementName=var3NameTxtBox}" Value="">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <TextBox Name ="var1NameTxtBox" HorizontalAlignment="Left" Margin="89,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBlock IsHitTestVisible="False" Text="Enter Variable 1 Name" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="89,192,0,0" Foreground="DarkGray">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Text, ElementName=var1NameTxtBox}" Value="">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
         <Button x:Name="resetbtn" Content="Reset" HorizontalAlignment="Left" Margin="532,77,0,0" VerticalAlignment="Top" Click="resetbtn_Click"/>
-        <TextBox x:Name="folderPathTxtBox" IsReadOnly="true" HorizontalAlignment="Left" Margin="174,78,0,0" VerticalAlignment="Top" Width="120" />
+        <TextBox x:Name="folderPathTxtBox" IsReadOnly="true" HorizontalAlignment="Left" Margin="174,78,0,0" VerticalAlignment="Top" TextWrapping="Wrap" Width="120" />
         <Button x:Name="browseBtn" Content="Browse" HorizontalAlignment="Left" Margin="128,74,0,0" VerticalAlignment="Top" Click="browseBtn_Click"/>
+        <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Left" Margin="217,311,483,23" RenderTransformOrigin="0.5,0.5">
+            <lvc:CartesianChart.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform AngleY="0.383"/>
+                    <RotateTransform/>
+                    <TranslateTransform Y="1.208"/>
+                </TransformGroup>
+            </lvc:CartesianChart.RenderTransform>
+            <lvc:CartesianChart.AxisX>
+                <lvc:Axis Title="X" Labels="{Binding BarLabels}"></lvc:Axis>
+            </lvc:CartesianChart.AxisX>
+            <lvc:CartesianChart.AxisY>
+                <lvc:Axis Title="Y" LabelFormatter="{Binding BarFormatter}"></lvc:Axis>
+            </lvc:CartesianChart.AxisY>
+        </lvc:CartesianChart>
+        <TextBox IsReadOnly="True" x:Name="data1TextBox_Copy" HorizontalAlignment="Left" Margin="89,217,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" x:Name="data2TextBox_Copy" HorizontalAlignment="Center" Margin="0,217,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" x:Name="data3TextBox_Copy" HorizontalAlignment="Right" Margin="0,217,75,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" x:Name="data1TextBox_Copy1" HorizontalAlignment="Left" Margin="89,292,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" x:Name="data2TextBox_Copy1" HorizontalAlignment="Center" Margin="0,292,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox IsReadOnly="True" x:Name="data3TextBox_Copy1" HorizontalAlignment="Right" Margin="0,292,75,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
