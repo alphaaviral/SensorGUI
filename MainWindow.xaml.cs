@@ -47,6 +47,8 @@ namespace sensorGUI
         private readonly BackgroundWorker worker = new BackgroundWorker();
         String[] dataArray;
         DispatcherTimer timer;
+        Stopwatch stopWatch = new Stopwatch();
+        
         public SeriesCollection SeriesCollection { get; set; }
         public string[] BarLabels { get; set; }
         public Func<double, string> BarFormatter { get; set; }
@@ -60,39 +62,18 @@ namespace sensorGUI
             textBoxList.Add(data1TextBox);
             textBoxList.Add(data2TextBox);
             textBoxList.Add(data3TextBox);
-            worker.DoWork += worker_DoWork;
-            //worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             Init_Graph();
-            Init_Timer();
-            
         }
 
-        private void Init_Timer()
+        private void UpdateGraph(string dat)
         {
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(0.5);
-            timer.Tick += timer_Tick;
-
-        }
-
-        private void worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            // run all background tasks here
             timeCount += 0.5;
-            if(dataArray!=null)
+            SeriesCollection[0].Values.Add(new ObservablePoint(timeCount, Double.Parse(dat)));
+
+            if (SeriesCollection[0].Values.Count > 50)
             {
-                SeriesCollection[0].Values.Add(new ObservablePoint(timeCount, Double.Parse(dataArray[0])));
-
-                if (SeriesCollection[0].Values.Count > 50)
-                {
-                    SeriesCollection[0].Values.RemoveAt(0);
-                }
+                SeriesCollection[0].Values.RemoveAt(0);
             }
-        }
-
-        private void timer_Tick(object sender, EventArgs e)
-        {
-            worker.RunWorkerAsync();
         }
 
         private void Init_Graph()
@@ -105,7 +86,6 @@ namespace sensorGUI
                     Values = new ChartValues<ObservablePoint> {new ObservablePoint(0,0)},
                 },
             };
-            //BarLabels = new[] {"0"};
             BarFormatter = value => value.ToString();
             DataContext = this;
             
@@ -277,6 +257,14 @@ namespace sensorGUI
                 return;
             }
             dataArray = data.Split(' ');
+            if (dataArray.Length != 3) return;
+            if(stopWatch.ElapsedMilliseconds > 100)
+            {
+                stopWatch.Restart();
+                Thread newThread = new Thread(() => UpdateGraph(dataArray[0]));
+                newThread.Start();
+            }
+
             logDataInCSV(data);
             Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -304,14 +292,15 @@ namespace sensorGUI
                 if (success)
                 {
                     ConnectToCOMPort();
-                    timer.Start();
+                    //Thread.Sleep(5000);
+                    stopWatch.Start();
                 }
             }
             else
             {
                 DisconnectFromCOMPort();
                 CloseFile();
-                timer.Stop();
+                stopWatch.Stop();
             }
         }
 
